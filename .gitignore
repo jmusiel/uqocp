@@ -1,0 +1,6 @@
+**.lmdb
+**.lmdb-lock
+**.npy
+**.pt
+**.traj
+**.json
