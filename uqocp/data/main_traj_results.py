@@ -45,37 +45,37 @@ if __name__ == "__main__":
     print("distributions: " + str(distributions))
 
 
-    # # Now execute main script
-    # calcs_dict = {}
-    # for checkpoint_path in checkpoints:
-    #     if checkpoint_path is not None:
-    #         save_path = checkpoint_path.split("/")[-1].split(".")[0]
-    #         os.makedirs(save_path, exist_ok=True)
-    #         try:
-    #             calcs_dict[save_path] = FinetunerCalc(checkpoint_path, mlp_params={
-    #                 "cpu": False,
-    #                 "optim": {
-    #                     "batch_size":5
-    #                 }
-    #             })
-    #         except:
-    #             print("ERROR: hit exception initializing: " + str(checkpoint_path))
-    #             Exception()
-    #     else:
-    #         save_path = "dft"
-    #         os.mkdir(save_path)
-    #         calcs_dict[save_path] = None
+    # Now execute main script
+    calcs_dict = {}
+    for checkpoint_path in checkpoints:
+        if checkpoint_path is not None:
+            save_path = checkpoint_path.split("/")[-1].split(".")[0]
+            os.makedirs(save_path, exist_ok=True)
+            try:
+                calcs_dict[save_path] = FinetunerCalc(checkpoint_path, mlp_params={
+                    "cpu": False,
+                    "optim": {
+                        "batch_size":5
+                    }
+                })
+            except:
+                print("ERROR: hit exception initializing: " + str(checkpoint_path))
+                Exception()
+        else:
+            save_path = "dft"
+            os.mkdir(save_path)
+            calcs_dict[save_path] = None
 
-    # for d in ["id"]:
-    #     trajids = df[df.distribution == d].random_id.tolist()
-    #     for tid in tqdm(trajids, d):
-    #         traj = Trajectory("/home/jovyan/shared-datasets/OC20/trajs/val_02_01/"+tid+".traj")
-    #         for save_path, calc in calcs_dict.items():
-    #             if calc is not None:
-    #                 ml_forces = np.array([x.get_forces() for x in compute_with_calc(traj, calc)])
-    #             else:
-    #                 ml_forces = np.array([x.get_forces() for x in traj])
-    #             np.save(save_path+"/"+tid, ml_forces)
+    for d in ["id"]:
+        trajids = df[df.distribution == d].random_id.tolist()
+        for tid in tqdm(trajids, d):
+            traj = Trajectory("/home/jovyan/shared-datasets/OC20/trajs/val_02_01/"+tid+".traj")
+            for save_path, calc in calcs_dict.items():
+                if calc is not None:
+                    ml_forces = np.array([x.get_forces() for x in compute_with_calc(traj, calc)])
+                else:
+                    ml_forces = np.array([x.get_forces() for x in traj])
+                np.save(save_path+"/"+tid, ml_forces)
 
 
     print("done")
