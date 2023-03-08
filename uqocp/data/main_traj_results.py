@@ -23,7 +23,7 @@ if __name__ == "__main__":
             "/home/jovyan/shared-scratch/joe/personal_checkpoints/ocp_public_3_3_2023/gemnet_oc/gemnet_oc_base_s2ef_all.pt",
             "/home/jovyan/shared-scratch/joe/personal_checkpoints/ocp_public_3_3_2023/gemnet_oc/gemnet_oc_base_s2ef_all_md.pt",
             "/home/jovyan/shared-scratch/joe/personal_checkpoints/ocp_public_3_3_2023/gemnet_oc/gemnet_oc_large_s2ef_all_md.pt",
-            "/home/jovyan/shared-scratch/joe/jobs/uncertainty/data/oc20_val/gnoc_oc22_oc20_all_s2ef",
+            "/home/jovyan/shared-scratch/joe/personal_checkpoints/ocp_public_3_3_2023/gemnet_oc_22/gnoc_oc22_oc20_all_s2ef.pt",
             None,
         ]
     print("checkpoints:")
@@ -60,7 +60,7 @@ if __name__ == "__main__":
                 })
             except:
                 print("ERROR: hit exception initializing: " + str(checkpoint_path))
-                Exception()
+                quit()
         else:
             save_path = "dft"
             os.mkdir(save_path)
