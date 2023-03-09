@@ -63,10 +63,10 @@ if __name__ == "__main__":
                 quit()
         else:
             save_path = "dft"
-            os.mkdir(save_path)
+            os.makedirs(save_path, exist_ok=True)
             calcs_dict[save_path] = None
 
-    for d in ["id"]:
+    for d in distributions:
         trajids = df[df.distribution == d].random_id.tolist()
         for tid in tqdm(trajids, d):
             traj = Trajectory("/home/jovyan/shared-datasets/OC20/trajs/val_02_01/"+tid+".traj")
