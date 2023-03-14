@@ -92,7 +92,7 @@ if __name__ == "__main__":
                 system_dict["en_error"].append(mean_error.tolist())
                 system_dict["en_stdev"].append(stdev.tolist())
 
-            print("done")
+        print("done")
 
         with open(d + '_' + json_save_name + '.json', "w") as json_file:
             json.dump(system_dict, json_file)
