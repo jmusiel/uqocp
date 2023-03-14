@@ -13,6 +13,7 @@ if __name__ == "__main__":
     parser.add_argument('-c','--checkpoints', nargs='+', help='<Required> List of paths to checkpoints for use, defaults to a preset list for an ensemble', required=False)
     parser.add_argument("-p","--picklefile", help='<Optional> Path to the pickle file for preloading tags, defaults to OC_20_val_data.pkl', required=False)
     parser.add_argument("-d", "--distributions", nargs='+', help='<Optional> Distributions in the pickle file to be sampled. Defaults to sampling all distributions.', required=False)
+    parser.add_argument("-s", "--skip", help='<Optional> Whether to skip files that exist already, if passed then false ', action="store_true")
     args = parser.parse_args()
 
     # choose checkpoints, defaults to five plus DFT
@@ -44,6 +45,11 @@ if __name__ == "__main__":
         distributions = list(set(df.distribution.to_list()))
     print("distributions: " + str(distributions))
 
+    # choose whether to replace existing files, or skip inference on them
+    skip = args.skip
+    if skip is None:
+        skip = False
+
 
     # Now execute main script
     calcs_dict = {}
@@ -71,11 +77,12 @@ if __name__ == "__main__":
         for tid in tqdm(trajids, d):
             traj = Trajectory("/home/jovyan/shared-datasets/OC20/trajs/val_02_01/"+tid+".traj")
             for save_path, calc in calcs_dict.items():
-                if calc is not None:
-                    ml_forces = np.array([x.get_forces() for x in compute_with_calc(traj, calc)])
-                else:
-                    ml_forces = np.array([x.get_forces() for x in traj])
-                np.save(save_path+"/"+tid, ml_forces)
+                if not skip or not os.path.isfile(save_path+"/"+tid+".npy"):
+                    if calc is not None:
+                        ml_forces = np.array([x.get_forces() for x in compute_with_calc(traj, calc)])
+                    else:
+                        ml_forces = np.array([x.get_forces() for x in traj])
+                    np.save(save_path+"/"+tid, ml_forces)
 
 
     print("done")
