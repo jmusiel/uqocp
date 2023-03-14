@@ -55,7 +55,7 @@ if __name__ == "__main__":
 
     i = 0
     # for d in distributions:
-    for d in ["ood"]:
+    for d in distributions:
         system_dict = {model.split("/")[-1]:[] for model in checkpoints[1:]}
         # system_dict["en_mean"] = []
         system_dict["en_error"] = []
