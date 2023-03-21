@@ -20,12 +20,12 @@ if __name__ == "__main__":
     checkpoints = args.checkpoints
     if checkpoints is None:
         checkpoints = [
-            "/home/jovyan/shared-scratch/joe/jobs/uncertainty/uqocp/uqocp/data/dft",
-            "/home/jovyan/shared-scratch/joe/jobs/uncertainty/uqocp/uqocp/data/gemnet_oc_base_s2ef_2M",
-            "/home/jovyan/shared-scratch/joe/jobs/uncertainty/uqocp/uqocp/data/gemnet_oc_base_s2ef_all",
-            "/home/jovyan/shared-scratch/joe/jobs/uncertainty/uqocp/uqocp/data/gemnet_oc_base_s2ef_all_md",
-            "/home/jovyan/shared-scratch/joe/jobs/uncertainty/uqocp/uqocp/data/gemnet_oc_large_s2ef_all_md",
-            "/home/jovyan/shared-scratch/joe/jobs/uncertainty/uqocp/uqocp/data/gnoc_oc22_oc20_all_s2ef",
+            "/home/jovyan/shared-scratch/joe/jobs/uncertainty/uqocp/uqocp/data/ocp_val/dft",
+            "/home/jovyan/shared-scratch/joe/jobs/uncertainty/uqocp/uqocp/data/ocp_val/gemnet_oc_base_s2ef_2M",
+            "/home/jovyan/shared-scratch/joe/jobs/uncertainty/uqocp/uqocp/data/ocp_val/gemnet_oc_base_s2ef_all",
+            "/home/jovyan/shared-scratch/joe/jobs/uncertainty/uqocp/uqocp/data/ocp_val/gemnet_oc_base_s2ef_all_md",
+            "/home/jovyan/shared-scratch/joe/jobs/uncertainty/uqocp/uqocp/data/ocp_val/gemnet_oc_large_s2ef_all_md",
+            "/home/jovyan/shared-scratch/joe/jobs/uncertainty/uqocp/uqocp/data/ocp_val/gnoc_oc22_oc20_all_s2ef",
         ]
     print("checkpoints:")
     for c in checkpoints:
