@@ -14,6 +14,7 @@ if __name__ == "__main__":
     parser.add_argument("-p","--picklefile", help='<Optional> Path to the pickle file for preloading tags, defaults to OC_20_val_data.pkl', required=False)
     parser.add_argument("-d", "--distributions", nargs='+', help='<Optional> Distributions in the pickle file to be sampled. Defaults to sampling all distributions.', required=False)
     parser.add_argument("-s", "--skip", help='<Optional> Whether to skip files that exist already, if passed then false ', action="store_true")
+    parser.add_argument("-sd", "--subdir", help='<Optional> Which subdirectory to save results to, defaults to ocp_val')
     args = parser.parse_args()
 
     # choose checkpoints, defaults to five plus DFT
@@ -50,12 +51,18 @@ if __name__ == "__main__":
     if skip is None:
         skip = False
 
+    # get given subdir (defaults to ocp_val)
+    subdir = args.subdir
+    if subdir is None:
+        subdir = "ocp_val"
+    print("subdir: " + str(subdir))
 
     # Now execute main script
     calcs_dict = {}
     for checkpoint_path in checkpoints:
         if checkpoint_path is not None:
             save_path = checkpoint_path.split("/")[-1].split(".")[0]
+            save_path = os.path.join(subdir, save_path)
             os.makedirs(save_path, exist_ok=True)
             try:
                 calcs_dict[save_path] = FinetunerCalc(checkpoint_path, mlp_params={
@@ -69,6 +76,7 @@ if __name__ == "__main__":
                 quit()
         else:
             save_path = "dft"
+            save_path = os.path.join(subdir, save_path)
             os.makedirs(save_path, exist_ok=True)
             calcs_dict[save_path] = None
 
