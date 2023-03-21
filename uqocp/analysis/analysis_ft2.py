@@ -57,10 +57,10 @@ if __name__ == "__main__":
     i = 0
     # for d in distributions:
     for d in distributions:
-        per_atom_dict = {model.split("/")[-1]:[] for model in checkpoints[1:]}
-        # per_atom_dict["en_mean"] = []
-        per_atom_dict["en_error"] = []
-        per_atom_dict["en_stdev"] = []
+        system_dict = {model.split("/")[-1]:[] for model in checkpoints[1:]}
+        # system_dict["en_mean"] = []
+        system_dict["en_error"] = []
+        system_dict["en_stdev"] = []
         # trajids = df[df.distribution == d].random_id.tolist()
         trajpaths = [name for name in glob.glob("/home/jovyan/shared-scratch/joe/repos/finetuna_2_data_private/data/MOFs_zeolites/Sudheesh_mof_zeolite/**/abinitio/oal_relaxation.traj", recursive=True)]
         if limit is not None:
@@ -76,39 +76,26 @@ if __name__ == "__main__":
                     break
 
             if all_exist:
-                # for every atom in every frame in every system, record the following:
-                # mean prediction of ensemble
-                # stdev of ensemble prediction
-                # error of mean prediction of ensemble
-                # error of each individual model
-                # distribution
-                i = i+1 #
-                forces_array = np.array([np.load(tpath).reshape(-1, 3) for tpath in tpaths])
-                forces_array = forces_array[:, np.all(forces_array != 0, axis=(0,2))]
+                forces_array = np.array([np.load(tpath) for tpath in tpaths])
+                forces_array = forces_array[:, :, np.all(forces_array != 0, axis=(0,1,3))]
                 dft_forces = forces_array[0]
                 forces_array = forces_array[1:]
                 mean_force = np.mean(forces_array, axis=0)
-                mean_error = np.linalg.norm(dft_forces - mean_force, axis=1)
-                stdev = np.zeros(mean_force.shape[0])
-                for arr, model in zip(forces_array, checkpoints[1:]):
+                mean_error = np.linalg.norm(dft_forces - mean_force, axis=2)
+                stdev = np.zeros_like(mean_error)
+                for arr in forces_array:
                     diff_array = arr - mean_force
-                    l2_norm_vector = np.linalg.norm(diff_array, axis=1)
-                    for n in l2_norm_vector:
-                        per_atom_dict[model.split("/")[-1]].append(n)
+                    l2_norm_vector = np.linalg.norm(diff_array, axis=2)
                     sq_l2_norm_vector = np.square(l2_norm_vector)
                     stdev = stdev + sq_l2_norm_vector
                 stdev = np.sqrt(stdev/forces_array.shape[0])
 
-                for m, e, s in zip(mean_force, mean_error, stdev):
-                    # per_atom_dict["en_mean"].append(m.tolist())
-                    per_atom_dict["en_error"].append(e)
-                    per_atom_dict["en_stdev"].append(s)
+                for arr, model in zip(forces_array, checkpoints[1:]):
+                    system_dict[model.split("/")[-1]].append(np.linalg.norm(arr - mean_force, axis=2).tolist())
+                system_dict["en_error"].append(mean_error.tolist())
+                system_dict["en_stdev"].append(stdev.tolist())
 
-                # print the per model mean force error
-                # for arr, model in zip(forces_array, model_paths[1:]):
-                #     mae = np.mean(np.linalg.norm(dft_forces - arr, axis=1))
-                #     print(model.split("/")[-1] + " MAE: " + str(mae))
-                # print("\n")
+        print("done")
 
-        with open(d + '_' + json_save_name + '_ft2.json', "w") as json_file:
-            json.dump(per_atom_dict, json_file)
+        with open(d + '_' + json_save_name + '_ft2_persys.json', "w") as json_file:
+            json.dump(system_dict, json_file)
