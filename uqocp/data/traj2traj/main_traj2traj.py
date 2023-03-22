@@ -66,23 +66,17 @@ if __name__ == "__main__":
         subdir = "ocp_val"
     print("subdir: " + str(subdir))
 
+    # check whether to do inference on given data (defaults to doing inference)
+    noinference = args.noinference
+    print("doing inference: " + str(not noinference))
+
     # check whether to also do an is2re relaxation (defaults to doing the is2re relaxation)
     norelax = args.norelax
-    if norelax is None:
-        norelax = True
     print("relaxing: " + str(not norelax))
 
     # check whether to also do an ensemble is2re relaxation (defaults to doing the ensemble is2re relaxation)
     noensrelax = args.noensrelax
-    if noensrelax is None:
-        noensrelax = True
     print("ensemble relaxing: " + str(not noensrelax))
-
-    # check whether to do inference on given data (defaults to doing inference)
-    noinference = args.noinference
-    if noinference is None:
-        noinference = True
-    print("doing inference: " + str(not noinference))
 
     # check how many systems to run inference on (defaults to doing all)
     maxsystems = args.max
@@ -119,11 +113,8 @@ if __name__ == "__main__":
     for d in distributions:
         # trajids = df[df.distribution == d].random_id.tolist()
         trajids = df[df.distribution == d]
-        j=0
-        for i, row in tqdm(trajids.iterrows(), d):
-            j = j+1
-            if maxsystems is not None and j > maxsystems:
-                break
+        trajids = [irow for irow in trajids.iterrows()][:maxsystems]
+        for i, row in tqdm(trajids, d):
             tid = row["random_id"]
             if "path" in row:
                 traj = Trajectory(row["path"])
@@ -131,7 +122,6 @@ if __name__ == "__main__":
                 traj = Trajectory("/home/jovyan/shared-datasets/OC20/trajs/val_02_01/"+tid+".traj")
             for save_path, calc in calcs_dict.items():
                 if not noinference:
-                    print(f"not noinference: {not noinference}")
                     writepath = save_path+"/"+tid+".traj"
                     if not skip or not os.path.isfile(writepath):
                         if calc is not None:
@@ -143,7 +133,6 @@ if __name__ == "__main__":
                             writetraj.write(atoms=x)
 
                 if not norelax:
-                    print(f"not norelax: {not norelax}")
                     writepath = save_path+"/"+tid+"_is2re.traj"
                     if not skip or not os.path.isfile(writepath):
                         if calc is not None:
@@ -153,7 +142,6 @@ if __name__ == "__main__":
                             dyn.run(fmax=0.03, steps=1000)
 
             if not noensrelax: # do the ensemble mean relaxation, save it to the dft folder and each individual inference to respective calc folders
-                print(f"not noensrelax: {not noensrelax}")
                 writepath = ens_save_path+"/"+tid+"_ens.traj"
                 if not skip or not os.path.isfile(writepath):
                     structure = traj[0].copy()
