@@ -113,7 +113,9 @@ if __name__ == "__main__":
     for d in distributions:
         # trajids = df[df.distribution == d].random_id.tolist()
         trajids = df[df.distribution == d]
-        trajids = [irow for irow in trajids.iterrows()][:maxsystems]
+        trajids = [irow for irow in trajids.iterrows()]
+        if maxsystems is not None:
+            trajids = trajids[:maxsystems]
         for i, row in tqdm(trajids, d):
             tid = row["random_id"]
             if "path" in row:
@@ -145,7 +147,7 @@ if __name__ == "__main__":
                 writepath = ens_save_path+"/"+tid+"_ens.traj"
                 if not skip or not os.path.isfile(writepath):
                     structure = traj[0].copy()
-                    structure.set_calculator(ens_calc)
+                    structure.calc = ens_calc
 
                     trajsdict = {}
                     for save_path in ens_calcs_dict.keys():
