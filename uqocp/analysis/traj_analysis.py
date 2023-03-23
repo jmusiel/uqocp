@@ -86,7 +86,7 @@ if __name__ == "__main__":
             energy_std = np.std(energy_array, axis=0)
             temp_dict["inf_e_error"] = energy_error.tolist()
             temp_dict["inf_e_stdev"] = energy_std.tolist()
-            temp_dict["dft_de"] = dft_energy[0] - dft_energy[-1]
+            temp_dict["dft_de"] = np.abs(dft_energy[0] - dft_energy[-1])
             temp_dict["inf_de_mean"] = mean_energy[0] - mean_energy[-1]
 
             forces_array = np.array([[image.get_forces() for image in traj] for traj in trajs])
@@ -108,7 +108,8 @@ if __name__ == "__main__":
         if exist_dict["is2re"]:
             trajs = [[image for image in Trajectory(tpath)] for tpath in pathsdict["is2re"]]
             deltae = [traj[0].get_potential_energy() - traj[-1].get_potential_energy() for traj in trajs]
-            temp_dict["is2re_de_error"] = (dft_energy[0] - dft_energy[-1]) - np.mean(deltae)
+            temp_dict["is2re_de"] = np.abs(np.mean(deltae))
+            temp_dict["is2re_de_error"] = np.abs(dft_energy[0] - dft_energy[-1]) - np.abs(np.mean(deltae))
             temp_dict["is2re_de_stdev"] = np.std(deltae)
 
         if exist_dict["ens"]:
@@ -155,6 +156,7 @@ if __name__ == "__main__":
             "inf_f_stdev": [],
             "is2re_de_error": [],
             "is2re_de_stdev": [],
+            "is2re_de": [],
             "ens_e_stdev": [],
             "ens_de_mean": [],
             "ens_f_stdev": [],
