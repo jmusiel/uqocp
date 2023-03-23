@@ -76,60 +76,37 @@ def plot_self_recal(name, num, predicted_y, stdev, true_y):
 
 def plot_recal(name, cal_predicted_y, cal_stdev, cal_true_y, predicted_y, stdev, true_y):
     uncal, recal = get_recalibrated_data(cal_predicted_y, cal_stdev, cal_true_y, predicted_y, stdev, true_y)
-    plotter("uncal_" + name, *uncal)
-    plotter("recal_" + name, *recal)
+    plotter("/".join(name.split("/")[:-1] + ["uncal_"+name.split("/")[-1]]), *uncal)
+    plotter("/".join(name.split("/")[:-1] + ["recal_"+name.split("/")[-1]]), *recal)
+
+def plot_all_is2re_cal_recal(ooddict, caldict, extra_name):
+    for name, method in {
+        "s2e_max": lambda udict: np.array([max(i) for i in udict["inf_e_stdev"]]),
+        "s2f_max": lambda udict: np.array([max([max(j) for j in i]) for i in udict["inf_f_stdev"]]),
+        "ens_e_max": lambda udict: np.array([max(i) for i in udict["ens_e_stdev"]]),
+        "ens_s2f_max": lambda udict: np.array([max([max(j) for j in i]) for i in udict["ens_f_stdev"]]),
+        "is2re_de_stdev": lambda udict: np.array([i for i in udict["is2re_de_stdev"]]),
+    }.items():
+        plot_recal(
+            name="id_ood/"+name+extra_name,
+            cal_predicted_y= np.array(caldict["dft_de"]),
+            cal_stdev=method(caldict),
+            cal_true_y= np.array(caldict["is2re_de"]),
+            predicted_y=np.array(ooddict["dft_de"]),
+            stdev=method(ooddict),
+            true_y=np.array(ooddict["is2re_de"]),
+        )
+
 
 if __name__ == "__main__":
     json_path = "/home/jovyan/shared-scratch/joe/jobs/uncertainty/uqocp/uqocp/analysis/ood_errors_traj2traj.json"
+    # json_path = "/home/jovyan/shared-scratch/joe/jobs/uncertainty/uqocp/uqocp/analysis/OC22_oc22_traj2traj.json"
     with open(json_path, "r") as jsonfile:
-        udict = json.load(jsonfile)
+        ooddict = json.load(jsonfile)
+    
+    json_path = "/home/jovyan/shared-scratch/joe/jobs/uncertainty/uqocp/uqocp/analysis/id_errors_traj2traj.json"
+    with open(json_path, "r") as jsonfile:
+        caldict = json.load(jsonfile)
 
-    predicted_y = np.array(udict["dft_de"])
-    stdev = np.array([i[-1] for i in udict["inf_e_stdev"]])
-    true_y = np.array(udict["is2re_de"])
-    plot_self_recal("calplotter/s2e_last", 10, predicted_y, stdev, true_y)
 
-    predicted_y = np.array(udict["dft_de"])
-    stdev = np.array([max(i) for i in udict["inf_e_stdev"]])
-    true_y = np.array(udict["is2re_de"])
-    plot_self_recal("calplotter/s2e_max", 10, predicted_y, stdev, true_y)
-
-    predicted_y = np.array(udict["dft_de"])
-    stdev = np.array([np.mean(i) for i in udict["inf_e_stdev"]])
-    true_y = np.array(udict["is2re_de"])
-    plot_self_recal("calplotter/s2e_mean", 10, predicted_y, stdev, true_y)
-
-    predicted_y = np.array(udict["dft_de"])
-    stdev = np.array([i[1] for i in udict["inf_e_stdev"]])
-    true_y = np.array(udict["is2re_de"])
-    plot_self_recal("calplotter/s2e_firststep", 10, predicted_y, stdev, true_y)
-
-    predicted_y = np.array(udict["dft_de"])
-    stdev = np.array([max([max(j) for j in i]) for i in udict["inf_f_stdev"]])
-    true_y = np.array(udict["is2re_de"])
-    plot_self_recal("calplotter/s2f_max", 10, predicted_y, stdev, true_y)
-
-    predicted_y = np.array(udict["dft_de"])
-    stdev = np.array([np.mean([max(j) for j in i]) for i in udict["inf_f_stdev"]])
-    true_y = np.array(udict["is2re_de"])
-    plot_self_recal("calplotter/s2f_mean", 10, predicted_y, stdev, true_y)
-
-    predicted_y = np.array(udict["dft_de"])
-    true_y = np.array(udict["is2re_de"])
-    stdev = np.array([max([max(j) for j in i]) for i in udict["ens_f_stdev"]])
-    plot_self_recal("calplotter/ens_s2f_max", 10, predicted_y, stdev, true_y)
-
-    predicted_y = np.array(udict["dft_de"])
-    true_y = np.array(udict["is2re_de"])
-    stdev = np.array([np.mean([max(j) for j in i]) for i in udict["ens_f_stdev"]])
-    plot_self_recal("calplotter/ens_s2f_mean", 10, predicted_y, stdev, true_y)
-
-    predicted_y = np.array(udict["dft_de"])
-    true_y = np.array(udict["is2re_de"])
-    stdev = np.array([i for i in udict["is2re_de_stdev"]])
-    plot_self_recal("calplotter/is2re_de_stdev", 10, predicted_y, stdev, true_y)
-
-    predicted_y = np.array(udict["dft_de"])
-    true_y = np.array(udict["is2re_de"])
-    stdev = np.array([i for i in udict["is2re_de_stdev"]]) + np.array([max([max(j) for j in i]) for i in udict["ens_f_stdev"]])
-    plot_self_recal("calplotter/linearcombo_is2re_de__ens_s2f_max_stdev", 10, predicted_y, stdev, true_y)
+    plot_all_is2re_cal_recal(ooddict, caldict, "_id_ood")
