@@ -10,7 +10,7 @@ import recalibration
 import json
 import numpy as np
 import os
-
+from tqdm import tqdm
 
 def plotter(name, predicted_y, stdev, true_y):
     p_exp, p_obs = (p.flatten() for p in metrics_calibration.get_proportion_lists_vectorized(
@@ -99,21 +99,60 @@ def plot_all_is2re_cal_recal(ooddict, caldict, extra_name):
         )
 
 def plot_all_ens_de_mean_cal_recal(ooddict, caldict, extra_name):
-    for name, method in {
-        "s2e_max": lambda udict: np.array([max(i) for i in udict["inf_e_stdev"]]),
-        "s2f_max": lambda udict: np.array([max([max(j) for j in i]) for i in udict["inf_f_stdev"]]),
-        "ens_e_max": lambda udict: np.array([max(i) for i in udict["ens_e_stdev"]]),
-        "ens_s2f_max": lambda udict: np.array([max([max(j) for j in i]) for i in udict["ens_f_stdev"]]),
-        "is2re_de_stdev": lambda udict: np.array([i for i in udict["is2re_de_stdev"]]),
+    for name, (key, method) in {
+        "s2e_max": ("inf_e_stdev", lambda sysx: max(sysx)),
+        "s2f_max": ("inf_f_stdev", lambda sysx: max([max(n) for n in sysx])),
+        "ens_e_max": ("ens_e_stdev", lambda sysx: max(sysx)),
+        "ens_s2f_max": ("ens_f_stdev", lambda sysx: max([max(n) for n in sysx])),
+        "is2re_de_stdev": ("is2re_de_stdev", lambda sysx: sysx),
     }.items():
+        kwargs = {}
+        keywords = [
+            "cal_predicted_y",
+            "cal_stdev",
+            "cal_true_y",
+            "predicted_y",
+            "stdev",
+            "true_y",
+        ]
+        for k in keywords:
+            kwargs[k] = []
+        for i, system_x_cal in tqdm(enumerate(caldict[key]), name):
+            if not type(system_x_cal) == float and not type(system_x_cal[0]) == float and len(system_x_cal[0]) == 0:
+                print("\nbad index: " + str(i))
+            else:
+                cal_value = method(system_x_cal)
+
+                kwargs["cal_predicted_y"].append(caldict["dft_de"][i])
+                kwargs["cal_stdev"].append(cal_value)
+                kwargs["cal_true_y"].append(caldict["ens_de_mean"][i])
+    
+        for i, system_x_ood in tqdm(enumerate(ooddict[key]), name):
+            if not type(system_x_ood) == float and not type(system_x_ood[0]) == float and len(system_x_ood[0]) == 0:
+                print("bad index: " + str(i))
+            else:
+                ood_value = method(system_x_ood)
+
+                kwargs["predicted_y"].append(ooddict["dft_de"][i])
+                kwargs["stdev"].append(ood_value)
+                kwargs["true_y"].append(ooddict["ens_de_mean"][i])
+
+        print("lengths:")
+        print("cal_predicted_y: "+str(len(kwargs["cal_predicted_y"])))
+        print("cal_stdev: "+str(len(kwargs["cal_stdev"])))
+        print("cal_true_y: "+str(len(kwargs["cal_true_y"])))
+        print("predicted_y: "+str(len(kwargs["predicted_y"])))
+        print("stdev: "+str(len(kwargs["stdev"])))
+        print("true_y: "+str(len(kwargs["true_y"])))
+
         plot_recal(
             name=extra_name+"/"+name,
-            cal_predicted_y= np.array(caldict["dft_de"])+ 1e-8,
-            cal_stdev=method(caldict)+ 1e-8,
-            cal_true_y= np.abs(np.array(caldict["ens_de_mean"]))+ 1e-8,
-            predicted_y=np.array(ooddict["dft_de"])+ 1e-8,
-            stdev=method(ooddict)+ 1e-8,
-            true_y=np.abs(np.array(ooddict["ens_de_mean"]))+ 1e-8,
+            cal_predicted_y=np.array(kwargs["cal_predicted_y"])+ 1e-8,
+            cal_stdev=np.array(kwargs["cal_stdev"])+ 1e-8,
+            cal_true_y=np.abs(np.array(kwargs["cal_true_y"]))+ 1e-8,
+            predicted_y=np.array(kwargs["predicted_y"])+ 1e-8,
+            stdev=np.array(kwargs["stdev"])+ 1e-8,
+            true_y=np.abs(np.array(kwargs["true_y"]))+ 1e-8,
         )
 
 def flatten(l):
@@ -168,13 +207,13 @@ def plot_all_s2e_vs_s2f_cal_recal(ooddict, caldict, extra_name):
 
 
 if __name__ == "__main__":
-    json_path = "/home/jovyan/shared-scratch/joe/jobs/uncertainty/uqocp/uqocp/analysis/ood_errors_traj2traj.json"
+    # json_path = "/home/jovyan/shared-scratch/joe/jobs/uncertainty/uqocp/uqocp/analysis/ood_errors_traj2traj.json"
     # json_path = "/home/jovyan/shared-scratch/joe/jobs/uncertainty/uqocp/uqocp/analysis/OC22_oc22_traj2traj.json"
     # json_path = "/home/jovyan/shared-scratch/joe/jobs/uncertainty/uqocp/uqocp/analysis/Sudheesh_mof_zeolite_errors_traj2traj.json"
-    with open(json_path, "r") as jsonfile:
-        ooddict = json.load(jsonfile)
+    # with open(json_path, "r") as jsonfile:
+    #     ooddict = json.load(jsonfile)
     
-    json_path = "/home/jovyan/shared-scratch/joe/jobs/uncertainty/uqocp/uqocp/analysis/id_errors_traj2traj.json"
+    json_path = "/home/jovyan/shared-scratch/joe/jobs/uncertainty/uqocp/uqocp/analysis/id_9000_traj2traj.json"
     with open(json_path, "r") as jsonfile:
         caldict = json.load(jsonfile)
 
@@ -186,11 +225,11 @@ if __name__ == "__main__":
 
 
     for i, j in [
-        ("ens_de_mean_ood","/home/jovyan/shared-scratch/joe/jobs/uncertainty/uqocp/uqocp/analysis/ood_errors_traj2traj.json"),
-        ("ens_de_mean_oc22","/home/jovyan/shared-scratch/joe/jobs/uncertainty/uqocp/uqocp/analysis/OC22_oc22_traj2traj.json"),
-        ("ens_de_mean_szeolite","/home/jovyan/shared-scratch/joe/jobs/uncertainty/uqocp/uqocp/analysis/Sudheesh_mof_zeolite_errors_traj2traj.json"),
+        ("done9000/ens_de_mean_ood","/home/jovyan/shared-scratch/joe/jobs/uncertainty/uqocp/uqocp/analysis/ood_9000_traj2traj.json"),
+        ("done9000/ens_de_mean_oc22","/home/jovyan/shared-scratch/joe/jobs/uncertainty/uqocp/uqocp/analysis/OC22_oc22_traj2traj.json"),
+        ("done9000/ens_de_mean_szeolite","/home/jovyan/shared-scratch/joe/jobs/uncertainty/uqocp/uqocp/analysis/Sudheesh_mof_zeolite_errors_traj2traj.json"),
     ]: 
-        os.mkdir(i)
+        os.makedirs(i, exist_ok=True)
         json_path = j
         with open(json_path, "r") as jsonfile:
             ooddict = json.load(jsonfile)
