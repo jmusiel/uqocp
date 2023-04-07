@@ -57,8 +57,7 @@ if __name__ == "__main__":
 
     # choose whether to replace existing files, or skip inference on them
     skip = args.skip
-    if skip is None:
-        skip = False
+    print("skip: " + str(skip))
 
     # get given subdir (defaults to ocp_val)
     subdir = args.subdir
