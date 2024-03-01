@@ -1,3 +1,5 @@
+**/uqocp.egg-info/**
+
 **.lmdb
 **.lmdb-lock
 **.npy
