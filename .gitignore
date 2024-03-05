@@ -1,8 +1,7 @@
 **/uqocp.egg-info/**
+**/__pycache__/**
 
 **.lmdb
 **.lmdb-lock
 **.npy
 **.pt
-**.traj
-**.json
