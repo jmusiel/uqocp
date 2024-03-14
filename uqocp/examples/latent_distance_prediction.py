@@ -42,25 +42,29 @@ def get_args():
     parser.add_argument(
         "--trajs_dir",
         type=str,
-        default="/home/jovyan/working/repos/uqocp/uqocp/examples/pt_o_example/single_frame_trajs",
+        default="[REPO]/examples/pt_o_example/single_frame_trajs",
         help="path to directory containing trajs with frames to predict latent embedding",
     )
     parser.add_argument(
         "--vasp_results_dir",
         type=str, 
-        default="/home/jovyan/working/repos/uqocp/uqocp/examples/pt_o_example/vasp_out",
+        default="[REPO]/examples/pt_o_example/vasp_out",
         help="path to directory containing vasp results for each of the corresponding frames",
     )
     parser.add_argument(
         "--vasp_reference_json",
         type=str, 
-        default="/home/jovyan/working/repos/uqocp/uqocp/examples/pt_o_example/vasp_reference.json",
+        default="[REPO]/examples/pt_o_example/vasp_reference.json",
         help="path to json file containing vasp reference energies for the slab and adsorbate used",
     )
     return parser.parse_args()
 
 
 def main(config):
+    for key in config.keys():
+        if type(config[key]) == str and "[REPO]" in config[key]:
+            config[key] = config[key].replace("[REPO]", os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+    
     pp.pprint(config)
 
     # read in the adslabs with vasp results, and the matching adslabs to predict energy and uncertainty with OCP
