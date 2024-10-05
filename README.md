@@ -21,14 +21,14 @@ Clone the repository, navigate to the root of the directory, and run:
 
 - FAISS (>= 1.7)
 
-_for GPU accelerated inference_
-- CUDA (>= 10.2)
-
 - The latent distance implementations in this repository were written to work with [this](https://github.com/FAIR-Chem/fairchem/tree/c52aeeacb3854c8d7841ab3953a9cfef284a301f) commit of the ocpmodels repository.
 
 _for this version of ocpmodels_
 - torch (= 1.11)
 - torch-geometric (= 2.1)
+
+_for GPU accelerated inference_
+- CUDA (>= 10.2)
 
 _Other versions of NumPy should work, but this one was used to create the .npz files_
 - NumPy (= 1.23)
