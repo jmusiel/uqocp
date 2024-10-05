@@ -1,5 +1,3 @@
-Uncertainty quantification methods and tools for OCP models
-
 ## UQOCP
 This repository provides examples and implementations of the methods and experiments found in the paper "Improved Uncertainty Estimation of Graph Neural Network Potentials Using Engineered Latent Space Distances". The manuscript is up on arXiv [here](https://arxiv.org/abs/2407.10844).
 
