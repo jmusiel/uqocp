@@ -140,6 +140,8 @@ def get_calibration(
         val_unc: list of predicted uncertainties for calibrating on.
         lambdas: A list of fixed transformations to apply to the uncalibrated uncertainty estimates.
         beta_init: A list that defines the initial weighting of the transformations, before optimization.
+        method: The optimization method to use.
+        options: A dictionary of options to pass to the optimization method.
     """
 
     # Calibrate based on sampled data.

@@ -6,6 +6,8 @@
 **.npy
 **.pt
 
+**/figures/**
+**/index/**
 **/examples/latent_distance_index/*
 !**/examples/latent_distance_index/create_index.sh
 
