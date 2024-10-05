@@ -1,6 +1,6 @@
 #!/bin/bash
 
-python ../../distance/conformal_prediction.py \
+python ../../uncertainty_quantification/conformal_prediction.py \
 --train_dir \
 /home/jovyan/working/repos/uqocp/data/train \
 --calib_dir \

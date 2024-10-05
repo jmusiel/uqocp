@@ -10,7 +10,7 @@ import json
 from ase.io import Trajectory, read
 
 from uqocp.utils.ocp_calculator_latent import OCPCalculatorLatent, DistanceIndex
-from uqocp.distance.conformal_prediction import FlexibleNLL
+from uqocp.uncertainty_quantification.conformal_prediction import FlexibleNLL
 from uqocp.utils.uncertainty_evaluation import recalibrate
 
 def get_args():
