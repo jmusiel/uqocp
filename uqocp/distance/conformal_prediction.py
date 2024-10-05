@@ -664,7 +664,7 @@ def get_parser():
     parser.add_argument(
         "--per_atom",
         type=str,
-        default="max_3",
+        default="sum",
         help="whether to collect per-atom data (max/mean/n) \n\
             max=calculate all the per-atom distance, and take the max distance\n\
             mean=calculate all the per-atom distances, and take the mean distance\n\
@@ -674,13 +674,13 @@ def get_parser():
     parser.add_argument(
         "--debug",
         type=str,
-        default="y",
+        default="n",
         help="whether to run in debug mode (y/n), this limits the data to 1000 elements to speed up execution"
     )
     parser.add_argument(
         "--num_nearest_neighbors",
         type=int,
-        default=10,
+        default=1,
         help="number of nearest neighbors to sample when calculating distance, distance is computed as the mean of these neighbor distance"
     )
     parser.add_argument(
@@ -722,7 +722,7 @@ def get_parser():
     parser.add_argument(
         "--nlist_div",
         type=int,
-        default=100,
+        default=1000,
         help="determines the number of clusters in the faiss index. The number of clusters will be calculated as len(train_X)/nlist_div (overriden by index_constructor if not None)"
     )
     parser.add_argument(
@@ -740,19 +740,19 @@ def get_parser():
     parser.add_argument(
         "--ncores",
         type=int,
-        default=32,
+        default=8,
         help="number of cores to use for parallel processing"
     )
     parser.add_argument(
         "--train_on_n_npz_files",
         type=int,
-        default=10,
+        default=20,
         help="number of npz files to train on, the rest will be added to the index after training is complete"
     )
     parser.add_argument(
         "--add_remaining_n_npz_files",
         type=int,
-        default=10,
+        default=0,
         help="number of npz files to add to the index after training is complete"
     )
     parser.add_argument(
@@ -786,13 +786,13 @@ def get_parser():
     parser.add_argument(
         "--calib_file_type",
         type=str,
-        default="vasp",
+        default="npz",
         help="what kind of files to load for calibration, options: [vasp, npz]"
     )
     parser.add_argument(
         "--test_file_type",
         type=str,
-        default="vasp",
+        default="npz",
         help="what kind of files to load for prediction, options: [vasp, npz]"
     )
     parser.add_argument(
@@ -805,7 +805,7 @@ def get_parser():
     parser.add_argument(
         "--fit_method",
         type=str,
-        default="ConformalPrediction",
+        default="flexibleNLL",
         help="which method to use for fitting (ConformalPrediction/flexibleNLL)"
     )
     
