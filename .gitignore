@@ -5,3 +5,7 @@
 **.lmdb-lock
 **.npy
 **.pt
+
+**/examples/latent_distance_index/*
+!**/examples/latent_distance_index/create_index.sh
+
